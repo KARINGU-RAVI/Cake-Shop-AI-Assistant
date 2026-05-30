@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   cake-shop-agent:
-    build: .
+    image: cake-shop-sales-agent:latest
     container_name: cake-shop-sales-agent
     ports:
       - "8000:8000"
@@ -21,7 +21,7 @@ services:
     command:
       - "http"
       - "cake-shop-agent:8000"
-      - "--url=mural-establish-trapped.ngrok-free.dev"
+      - "--domain=mural-establish-trapped.ngrok-free.dev"
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     depends_on:
