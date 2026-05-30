@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cake-shop-agent:
+    build: .
+    container_name: cake-shop-sales-agent
+    ports:
+      - "8000:8000"
+    volumes:
+      - cake_db_volume:/app/data
+    environment:
+      - DATABASE_URL=sqlite:////app/data/cake_shop.db
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  cake_db_volume:
+    driver: local
