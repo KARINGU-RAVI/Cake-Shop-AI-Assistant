@@ -13,8 +13,8 @@ Base.metadata.create_all(bind=engine)
 logger.info("Database schemas initialized successfully.")
 
 app = FastAPI(
-    title="The Cake Shop AI Sales Agent",
-    description="Production-grade AI WhatsApp Sales Agent for autonomous ordering, customization, and mock checkout workflows.",
+    title="Sweet Cheeks Bakery AI Sales Agent",
+    description="Production-grade AI WhatsApp Sales Agent for autonomous ordering, customization, and mock checkout workflows for Sweet Cheeks Bakery.",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"

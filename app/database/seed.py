@@ -2,25 +2,40 @@
 # Single source of truth for flavors, sizes, and pricing rules
 
 CAKE_CATALOG = {
-    "Chocolate Cake": {
+    "Chocolate Truffle Cake": {
         "1kg": 500,
         "2kg": 900,
         "3kg": 1300
     },
-    "Vanilla Cake": {
-        "1kg": 450,
-        "2kg": 850,
-        "3kg": 1200
+    "Black Forest Cake": {
+        "1kg": 550,
+        "2kg": 1000,
+        "3kg": 1450
     },
     "Red Velvet Cake": {
         "1kg": 650,
         "2kg": 1200,
         "3kg": 1700
     },
-    "Black Forest Cake": {
+    "Vanilla Cream Cake": {
+        "1kg": 450,
+        "2kg": 850,
+        "3kg": 1200
+    },
+    "Butterscotch Cake": {
         "1kg": 550,
         "2kg": 1000,
         "3kg": 1450
+    },
+    "Pineapple Cake": {
+        "1kg": 500,
+        "2kg": 900,
+        "3kg": 1300
+    },
+    "Fruit Cake": {
+        "1kg": 700,
+        "2kg": 1350,
+        "3kg": 1900
     }
 }
 

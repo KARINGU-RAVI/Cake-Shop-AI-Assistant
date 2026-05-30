@@ -36,7 +36,8 @@ class OrderService:
         message_on_cake: Optional[str] = None,
         quantity: int = 1,
         photo_cake: bool = False,
-        eggless: bool = False
+        eggless: bool = False,
+        custom_extra_charges: float = 0.0
     ) -> Dict[str, Any]:
         """
         Processes order request, saves Customer, Order, and OrderItem to DB, and returns confirmation metadata.
@@ -47,7 +48,7 @@ class OrderService:
         customer = cust_repo.get_or_create(phone_number)
         
         # Calculate extra charges
-        extra_charges = 0.0
+        extra_charges = custom_extra_charges
         if photo_cake:
             extra_charges += 150.0  # Photo cake fee
         if eggless:

@@ -5,12 +5,12 @@ from app.services.order_service import OrderService
 
 def test_cake_catalog_prices():
     # Test valid prices from seed
-    assert get_cake_price("Chocolate Cake", "1kg") == 500.0
-    assert get_cake_price("Vanilla Cake", "2kg") == 850.0
+    assert get_cake_price("Chocolate Truffle Cake", "1kg") == 500.0
+    assert get_cake_price("Vanilla Cream Cake", "2kg") == 850.0
     assert get_cake_price("Red Velvet Cake", "3kg") == 1700.0
     
     # Test normalization/case sensitivity
-    assert get_cake_price("chocolate cake", "2 kg") == 900.0
+    assert get_cake_price("chocolate truffle cake", "2 kg") == 900.0
     
     # Test fallback
     assert get_cake_price("Unknown Cake", "1kg") == 0.0

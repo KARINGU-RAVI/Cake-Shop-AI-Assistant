@@ -54,7 +54,8 @@ def create_order(
     message_on_cake: str,
     quantity: int,
     photo_cake: bool,
-    eggless: bool
+    eggless: bool,
+    custom_extra_charges: float
 ) -> Dict[str, Any]:
     """
     Creates a new customer order and item records in the database.
@@ -73,8 +74,9 @@ def create_order(
         quantity: The quantity of cakes.
         photo_cake: Set to True if this is a custom photo cake (₹150 charge applies).
         eggless: Set to True if this is an eggless cake (₹50 charge applies).
+        custom_extra_charges: Sum of extra costs for birthday accessories or combo options.
     """
-    logger.info(f"Executing tool: create_order for phone {phone_number}, flavor {flavor}, size {size}.")
+    logger.info(f"Executing tool: create_order for phone {phone_number}, flavor {flavor}, size {size}, custom extra ₹{custom_extra_charges}.")
     with SessionLocal() as db:
         return OrderService.create_order(
             db=db,
@@ -89,7 +91,8 @@ def create_order(
             message_on_cake=message_on_cake,
             quantity=quantity,
             photo_cake=photo_cake,
-            eggless=eggless
+            eggless=eggless,
+            custom_extra_charges=custom_extra_charges
         )
 
 def get_order_status(order_id: str) -> Dict[str, Any]:
