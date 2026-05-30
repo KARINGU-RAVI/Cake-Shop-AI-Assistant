@@ -14,6 +14,19 @@ services:
       - .env
     restart: unless-stopped
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: cake-shop-ngrok
+    restart: unless-stopped
+    command:
+      - "http"
+      - "cake-shop-agent:8000"
+      - "--url=mural-establish-trapped.ngrok-free.dev"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - cake-shop-agent
+
 volumes:
   cake_db_volume:
     driver: local
