@@ -11,7 +11,7 @@ from app.core.logger import logger
 
 class ConversationManager:
     @staticmethod
-    def process_message(db: Session, phone_number: str, user_name: str, message_content: str) -> str:
+    def process_message(db: Session, phone_number: str, user_name: str, message_content: str, whatsapp_message_id: str = None) -> str:
         """
         Orchestrates session memory loading, Gemini generation, recursive tool execution,
         and database message persistence.
@@ -26,7 +26,8 @@ class ConversationManager:
         user_msg = Message(
             customer_id=customer.id,
             sender_type="USER",
-            content=message_content
+            content=message_content,
+            whatsapp_message_id=whatsapp_message_id
         )
         msg_repo.create(user_msg)
         

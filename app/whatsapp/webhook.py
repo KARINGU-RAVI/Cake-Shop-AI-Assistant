@@ -2,9 +2,11 @@ import hmac
 import hashlib
 from fastapi import APIRouter, Request, Response, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.config import settings
 from app.database.db import get_db
 from app.agent.conversation_manager import ConversationManager
+from app.repositories.message_repository import MessageRepository
 from app.whatsapp.sender import whatsapp_sender
 from app.core.logger import logger
 
@@ -94,38 +96,48 @@ async def receive_webhook(
             messages = value.get("messages", [])
             contacts = value.get("contacts", [])
             
-            if not messages:
-                continue
+            for msg in messages:
+                if msg.get("type") != "text":
+                    # Only support text messages initially
+                    logger.info(f"Skipping non-text message type '{msg.get('type')}' from {msg.get('from')}.")
+                    continue
+                    
+                wamid = msg.get("id")
+                from_phone = msg.get("from")
+                message_text = msg.get("text", {}).get("body", "")
                 
-            # Parse only the first incoming message block
-            msg = messages[0]
-            if msg.get("type") != "text":
-                # Only support text messages initially
-                logger.info(f"Skipping non-text message type '{msg.get('type')}' from {msg.get('from')}.")
-                continue
+                # Fetch profile name
+                wa_name = "Customer"
+                if contacts:
+                    wa_name = contacts[0].get("profile", {}).get("name", "Customer")
+                    
+                logger.info(f"Message parsed: from={from_phone}, sender_name={wa_name}, body='{message_text}', wamid={wamid}")
                 
-            from_phone = msg.get("from")
-            message_text = msg.get("text", {}).get("body", "")
-            
-            # Fetch profile name
-            wa_name = "Customer"
-            if contacts:
-                wa_name = contacts[0].get("profile", {}).get("name", "Customer")
+                # Check for duplicate message ID (wamid) in database
+                if wamid:
+                    msg_repo = MessageRepository(db)
+                    existing_msg = msg_repo.get_by_whatsapp_message_id(wamid)
+                    if existing_msg:
+                        logger.info(f"Duplicate WhatsApp message ID detected: {wamid}. Skipping processing.")
+                        continue
                 
-            logger.info(f"Message parsed: from={from_phone}, sender_name={wa_name}, body='{message_text}'")
-            
-            # Generate AI response
-            try:
-                ai_reply = ConversationManager.process_message(
-                    db=db,
-                    phone_number=from_phone,
-                    user_name=wa_name,
-                    message_content=message_text
-                )
-                
-                # Send response back to the customer
-                whatsapp_sender.send_text_message(to_phone=from_phone, text_body=ai_reply)
-            except Exception as loop_err:
-                logger.error(f"Error handling conversation loop: {str(loop_err)}")
-                
+                # Generate AI response
+                try:
+                    ai_reply = ConversationManager.process_message(
+                        db=db,
+                        phone_number=from_phone,
+                        user_name=wa_name,
+                        message_content=message_text,
+                        whatsapp_message_id=wamid
+                    )
+                    
+                    # Send response back to the customer
+                    whatsapp_sender.send_text_message(to_phone=from_phone, text_body=ai_reply)
+                except IntegrityError:
+                    # Occurs if another thread saved the same wamid under the unique constraint
+                    logger.warning(f"IntegrityError: Duplicate message ID detected via database constraint: {wamid}. Skipping processing.")
+                    db.rollback()  # Rollback transaction to keep session clean
+                except Exception as loop_err:
+                    logger.error(f"Error handling conversation loop for wamid={wamid}: {str(loop_err)}")
+                    
     return {"status": "accepted"}
