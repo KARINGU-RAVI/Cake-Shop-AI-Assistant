@@ -55,3 +55,6 @@ cloudflared.exe
 *.njsproj
 *.sln
 *.swp
+
+# .\ngrok.exe http --url=mural-establish-trapped.ngrok-free.dev 8000
+#  python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
