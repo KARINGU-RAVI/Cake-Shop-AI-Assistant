@@ -8,6 +8,7 @@ class WhatsAppSender:
         self.access_token = settings.WHATSAPP_TOKEN
         self.api_version = "v19.0"
         self.base_url = f"https://graph.facebook.com/{self.api_version}/{self.phone_number_id}/messages"
+        self.session = requests.Session()  # High-performance persistent connection pool
         logger.info(f"Initialized WhatsAppSender with URL: {self.base_url}")
 
     def send_text_message(self, to_phone: str, text_body: str) -> bool:
@@ -34,7 +35,7 @@ class WhatsAppSender:
         
         try:
             logger.info(f"Sending WhatsApp message to {clean_phone}...")
-            response = requests.post(self.base_url, json=payload, headers=headers, timeout=10)
+            response = self.session.post(self.base_url, json=payload, headers=headers, timeout=10)
             
             if response.status_code in [200, 201]:
                 res_data = response.json()
